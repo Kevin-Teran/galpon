@@ -1,0 +1,246 @@
+// This file is the Prisma schema for the Galpon monitoring platform.
+// @author Kevin Mariano — @copyright Galpon
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  OPERATOR
+}
+
+enum NodeType {
+  INTERIOR
+  EXTERIOR
+}
+
+enum Metric {
+  TEMPERATURE
+  HUMIDITY
+}
+
+enum AlertLevel {
+  GREEN
+  YELLOW_LOW
+  YELLOW_HIGH
+  RED_LOW
+  RED_HIGH
+}
+
+enum DeviceType {
+  PUMP
+  FAN
+}
+
+enum DeviceAction {
+  ON
+  OFF
+}
+
+enum EventReason {
+  YELLOW_LOW
+  YELLOW_HIGH
+  RED_LOW
+  RED_HIGH
+  MANUAL
+  SCHEDULE
+}
+
+// ─── Models ──────────────────────────────────────────────────────────────────
+
+model Organization {
+  id          String       @id @default(cuid())
+  name        String
+  alertRanges AlertRange[]
+  sheds       Shed[]
+  users       User[]
+  alerts      Alert[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@map("organizations")
+}
+
+/// Rangos de alerta globales por organización y métrica.
+/// Estructura ascendente:
+///   value < yellowLowMin          → RED_LOW
+///   [yellowLowMin, greenMin)      → YELLOW_LOW
+///   [greenMin, greenMax]          → GREEN
+///   (greenMax, yellowHighMax]     → YELLOW_HIGH
+///   value > yellowHighMax         → RED_HIGH
+model AlertRange {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  metric         Metric
+  yellowLowMin   Float
+  greenMin       Float
+  greenMax       Float
+  yellowHighMax  Float
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([organizationId, metric])
+  @@map("alert_ranges")
+}
+
+model Shed {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  name           String
+  description    String?
+  location       String?
+  latitude       Float?
+  longitude      Float?
+  area           Float?       // área en m²
+  fanCount       Int          @default(0)
+  nodes          Node[]
+  pumps          Pump[]
+  fans           Fan[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@map("sheds")
+}
+
+/// Un topic MQTT = un sensor = una sola métrica.
+/// type indica dónde está instalado el sensor físicamente.
+model Node {
+  id           String        @id @default(cuid())
+  shedId       String
+  shed         Shed          @relation(fields: [shedId], references: [id], onDelete: Cascade)
+  hardwareId   String        @unique
+  name         String
+  type         NodeType      // INTERIOR | EXTERIOR — ubicación física del sensor
+  metric       Metric        // TEMPERATURE | HUMIDITY — única métrica que publica
+  isActive     Boolean       @default(true)
+  measurements Measurement[]
+  alerts       Alert[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("nodes")
+}
+
+/// Bomba de agua — topic independiente, solo recibe on/off.
+model Pump {
+  id          String        @id @default(cuid())
+  shedId      String
+  shed        Shed          @relation(fields: [shedId], references: [id], onDelete: Cascade)
+  hardwareId  String        @unique
+  name        String
+  pumpNumber  Int
+  model       String?
+  isActive    Boolean       @default(true)
+  pumpEvents  DeviceEvent[] @relation("PumpEvents")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("pumps")
+}
+
+model Fan {
+  id          String        @id @default(cuid())
+  shedId      String
+  shed        Shed          @relation(fields: [shedId], references: [id], onDelete: Cascade)
+  hardwareId  String        @unique
+  name        String
+  fanNumber   Int
+  model       String?
+  isActive    Boolean       @default(true)
+  fanEvents   DeviceEvent[] @relation("FanEvents")
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("fans")
+}
+
+model Measurement {
+  id        String   @id @default(cuid())
+  nodeId    String
+  node      Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  metric    Metric
+  value     Float
+  timestamp DateTime @default(now())
+
+  @@index([nodeId, metric, timestamp])
+  @@map("measurements")
+}
+
+/// Registro de activaciones de bombas y ventiladores para trazabilidad.
+/// durationSeconds se calcula y persiste al registrar endedAt.
+model DeviceEvent {
+  id               String       @id @default(cuid())
+  deviceHardwareId String
+  deviceType       DeviceType
+  action           DeviceAction
+  reason           EventReason
+  pumpId           String?
+  pump             Pump?        @relation("PumpEvents", fields: [pumpId], references: [id])
+  fanId            String?
+  fan              Fan?         @relation("FanEvents", fields: [fanId], references: [id])
+  startedAt        DateTime     @default(now())
+  endedAt          DateTime?
+  durationSeconds  Int?
+
+  @@index([deviceHardwareId, startedAt])
+  @@map("device_events")
+}
+
+model Alert {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  nodeId         String
+  node           Node         @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  metric         Metric
+  alertLevel     AlertLevel
+  value          Float
+  createdAt      DateTime     @default(now())
+  resolvedAt     DateTime?
+
+  @@index([organizationId, createdAt])
+  @@index([nodeId, createdAt])
+  @@map("alerts")
+}
+
+model User {
+  id                    String        @id @default(cuid())
+  email                 String        @unique
+  passwordHash          String
+  name                  String
+  role                  Role
+  organizationId        String?
+  organization          Organization? @relation(fields: [organizationId], references: [id])
+  pushSubscription      Json?
+  resetPasswordToken    String?       @unique
+  resetPasswordExpiry   DateTime?
+  sessions              UserSession[]
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  @@map("users")
+}
+
+/// Sesiones JWT. jti permite invalidar tokens individuales (logout).
+model UserSession {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jti       String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("user_sessions")
+}

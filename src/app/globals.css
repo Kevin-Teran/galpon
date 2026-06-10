@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+/* ── Dark mode class-based (Tailwind v4) ─────────────────────────────────── */
+@variant dark (&:is(.dark, .dark *));
+
+/* ── CSS variables por tema ──────────────────────────────────────────────── */
+:root {
+  --bg-base:        #f8fafc;
+  --bg-surface:     #ffffff;
+  --bg-subtle:      #f1f5f9;
+  --border:         #e2e8f0;
+  --text-primary:   #0f172a;
+  --text-secondary: #64748b;
+  --text-muted:     #94a3b8;
+  --accent:         #10b981;
+  --accent-hover:   #059669;
+  --danger:         #ef4444;
+  --warning:        #f59e0b;
+}
+
+.dark {
+  --bg-base:        #020617;
+  --bg-surface:     #0f172a;
+  --bg-subtle:      #1e293b;
+  --border:         #1e293b;
+  --text-primary:   #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted:     #475569;
+  --accent:         #10b981;
+  --accent-hover:   #34d399;
+  --danger:         #f87171;
+  --warning:        #fbbf24;
+}
+
+/* ── Base ────────────────────────────────────────────────────────────────── */
+html { scroll-behavior: smooth; }
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans, Arial, sans-serif);
+  transition: background-color 0.2s, color 0.2s;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 9999px; }
