@@ -1,9 +1,9 @@
 /**
  * @file route.ts
- * @route /src/app/api/pumps/route.ts
- * @description GET /api/pumps | POST — bombas de agua bajo un nodo físico.
+ * @route /src/app/api/sensors/route.ts
+ * @description GET /api/sensors | POST — sensores de un nodo (un topic = una métrica).
  * @author Kevin Mariano
- * @version 2.0.0
+ * @version 1.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -18,29 +18,29 @@ const createSchema = z.object({
   nodeId:     z.string().min(1),
   hardwareId: z.string().min(1).max(100),
   name:       z.string().min(2).max(100),
-  pumpNumber: z.number().int().min(1),
-  model:      z.string().max(100).optional(),
+  metric:     z.enum(["TEMPERATURE", "HUMIDITY"]),
+  side:       z.enum(["INTERIOR", "EXTERIOR"]),
 });
 
 export async function GET(req: NextRequest) {
   try {
     await requireRole(req, Role.OPERATOR);
-    const nodeId = req.nextUrl.searchParams.get("nodeId") ?? undefined;
-    const pumps  = await prisma.pump.findMany({
+    const nodeId  = req.nextUrl.searchParams.get("nodeId") ?? undefined;
+    const sensors = await prisma.sensor.findMany({
       where:   nodeId ? { nodeId } : {},
       include: { node: { select: { name: true, shed: { select: { name: true } } } } },
-      orderBy: { pumpNumber: "asc" },
+      orderBy: { createdAt: "asc" },
     });
-    return Response.json(pumps);
+    return Response.json(sensors);
   } catch (err) { return apiErrorResponse(err); }
 }
 
 export async function POST(req: NextRequest) {
   try {
     await requireRole(req, Role.ADMIN);
-    const body = await req.json().catch(() => ({}));
-    const data = createSchema.parse(body);
-    const pump = await prisma.pump.create({ data });
-    return Response.json(pump, { status: 201 });
+    const body   = await req.json().catch(() => ({}));
+    const data   = createSchema.parse(body);
+    const sensor = await prisma.sensor.create({ data });
+    return Response.json(sensor, { status: 201 });
   } catch (err) { return apiErrorResponse(err); }
 }

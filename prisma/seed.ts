@@ -1,12 +1,16 @@
 /**
  * @file seed.ts
  * @route /prisma/seed.ts
- * @description Seed inicial de la base de datos Galpon.
- *              Arquitectura: un topic MQTT = un sensor = una sola métrica.
- *              Sensores, bombas y ventiladores son entidades independientes.
- *              Es idempotente — se puede ejecutar múltiples veces sin duplicar datos.
+ * @description Seed inicial. Jerarquía real del galpón:
+ *              Galpón → Nodo (bloque) → {4 Sensores + Bomba}
+ *              Galpón → Ventiladores (independientes del nodo)
+ *
+ *              Cada nodo representa un bloque físico del galpón.
+ *              Tiene 4 sensores: temp/hum × cara exterior + cara interior del bloque.
+ *              La bomba riega ese bloque para humidificar el interior.
+ *              Los ventiladores pertenecen al galpón y se activan si la humidificación no basta.
  * @author Kevin Mariano
- * @version 2.0.0
+ * @version 4.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -17,10 +21,12 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL! });
-const prisma = new PrismaClient({ adapter });
+const prisma  = new PrismaClient({ adapter });
 
-const ORG_ID  = "org-galpon-demo";
-const SHED_ID = "shed-galpon-01";
+const ORG_ID    = "org-galpon-demo";
+const SHED_ID   = "shed-galpon-01";
+const NODE_1_ID = "node-bloque-1";
+const NODE_2_ID = "node-bloque-2";
 
 async function main(): Promise<void> {
   console.log("🌱 Iniciando seed...\n");
@@ -42,7 +48,7 @@ async function main(): Promise<void> {
   });
   console.log(`  ✅ Organización →  ${org.name}  (id: ${org.id})`);
 
-  // ── 3. Admin de la organización ─────────────────────────────────────────────
+  // ── 3. Admin ─────────────────────────────────────────────────────────────────
   const adminHash = await bcrypt.hash("Admin123456!", 12);
   await prisma.user.upsert({
     where:  { email: "admin@finca.com" },
@@ -51,7 +57,7 @@ async function main(): Promise<void> {
   });
   console.log("  ✅ ADMIN        →  admin@finca.com   /  Admin123456!");
 
-  // ── 4. Operador ─────────────────────────────────────────────────────────────
+  // ── 4. Operador ──────────────────────────────────────────────────────────────
   const operatorHash = await bcrypt.hash("Operador123!", 12);
   await prisma.user.upsert({
     where:  { email: "operador@finca.com" },
@@ -60,7 +66,7 @@ async function main(): Promise<void> {
   });
   console.log("  ✅ OPERATOR     →  operador@finca.com /  Operador123!");
 
-  // ── 5. Rangos de alerta ─────────────────────────────────────────────────────
+  // ── 5. Rangos de alerta ──────────────────────────────────────────────────────
   await prisma.alertRange.upsert({
     where:  { organizationId_metric: { organizationId: org.id, metric: "TEMPERATURE" } },
     update: {},
@@ -73,7 +79,7 @@ async function main(): Promise<void> {
   });
   console.log("  ✅ Rangos de alerta (Temperatura + Humedad)");
 
-  // ── 6. Galpón demo ──────────────────────────────────────────────────────────
+  // ── 6. Galpón demo ───────────────────────────────────────────────────────────
   const shed = await prisma.shed.upsert({
     where:  { id: SHED_ID },
     update: {},
@@ -81,63 +87,95 @@ async function main(): Promise<void> {
       id: SHED_ID, organizationId: org.id, name: "Galpón 1",
       description: "Galpón principal de demostración",
       location: "Sede Principal — Bloque A",
-      latitude: 10.391049, longitude: -75.479426, area: 500, fanCount: 2,
+      mapsUrl: "https://maps.app.goo.gl/VF2pfvuKChp9Apt67",
+      area: 500,
     },
   });
   console.log(`  ✅ Galpón       →  ${shed.name}  (id: ${shed.id})`);
 
-  // ── 7. Sensores — un topic = una sola métrica ───────────────────────────────
-  // Sensores de temperatura interiores
-  await prisma.node.upsert({
-    where:  { hardwareId: "TEMP-INT-001" },
+  // ── 7. Nodos — bloques físicos con sensores y bomba ──────────────────────────
+  //
+  //  Cada nodo = un bloque del galpón.
+  //  El nodo está embebido en el bloque y tiene sensores en ambas caras:
+  //    - Cara EXTERIOR: mide temperatura y humedad del ambiente externo
+  //    - Cara INTERIOR: mide temperatura y humedad dentro del galpón
+  //  La bomba riega ese bloque para humidificar el interior.
+
+  const node1 = await prisma.node.upsert({
+    where:  { id: NODE_1_ID },
     update: {},
-    create: { shedId: shed.id, hardwareId: "TEMP-INT-001", name: "Temp. Interior 1", type: "INTERIOR", metric: "TEMPERATURE", isActive: true },
+    create: { id: NODE_1_ID, shedId: shed.id, name: "Bloque 1", isActive: true },
   });
-  await prisma.node.upsert({
-    where:  { hardwareId: "TEMP-INT-002" },
+  const node2 = await prisma.node.upsert({
+    where:  { id: NODE_2_ID },
     update: {},
-    create: { shedId: shed.id, hardwareId: "TEMP-INT-002", name: "Temp. Interior 2", type: "INTERIOR", metric: "TEMPERATURE", isActive: true },
+    create: { id: NODE_2_ID, shedId: shed.id, name: "Bloque 2", isActive: true },
+  });
+  console.log("  ✅ Nodos/Bloques →  Bloque 1, Bloque 2");
+
+  // ── 8. Sensores — 4 por bloque (un topic = una métrica = un lado) ────────────
+
+  // Bloque 1 — cara exterior
+  await prisma.sensor.upsert({
+    where:  { hardwareId: "B1-TEMP-EXT" },
+    update: { side: "EXTERIOR", metric: "TEMPERATURE", name: "Temp. Exterior B1" },
+    create: { nodeId: node1.id, hardwareId: "B1-TEMP-EXT", name: "Temp. Exterior B1", metric: "TEMPERATURE", side: "EXTERIOR", isActive: true },
+  });
+  await prisma.sensor.upsert({
+    where:  { hardwareId: "B1-HUM-EXT" },
+    update: { side: "EXTERIOR", metric: "HUMIDITY", name: "Hum. Exterior B1" },
+    create: { nodeId: node1.id, hardwareId: "B1-HUM-EXT",  name: "Hum. Exterior B1",  metric: "HUMIDITY",    side: "EXTERIOR", isActive: true },
+  });
+  // Bloque 1 — cara interior
+  await prisma.sensor.upsert({
+    where:  { hardwareId: "B1-TEMP-INT" },
+    update: { side: "INTERIOR", metric: "TEMPERATURE", name: "Temp. Interior B1" },
+    create: { nodeId: node1.id, hardwareId: "B1-TEMP-INT", name: "Temp. Interior B1", metric: "TEMPERATURE", side: "INTERIOR", isActive: true },
+  });
+  await prisma.sensor.upsert({
+    where:  { hardwareId: "B1-HUM-INT" },
+    update: { side: "INTERIOR", metric: "HUMIDITY", name: "Hum. Interior B1" },
+    create: { nodeId: node1.id, hardwareId: "B1-HUM-INT",  name: "Hum. Interior B1",  metric: "HUMIDITY",    side: "INTERIOR", isActive: true },
   });
 
-  // Sensores de humedad interiores
-  await prisma.node.upsert({
-    where:  { hardwareId: "HUM-INT-001" },
-    update: {},
-    create: { shedId: shed.id, hardwareId: "HUM-INT-001", name: "Hum. Interior 1", type: "INTERIOR", metric: "HUMIDITY", isActive: true },
+  // Bloque 2 — cara exterior
+  await prisma.sensor.upsert({
+    where:  { hardwareId: "B2-TEMP-EXT" },
+    update: { side: "EXTERIOR", metric: "TEMPERATURE", name: "Temp. Exterior B2" },
+    create: { nodeId: node2.id, hardwareId: "B2-TEMP-EXT", name: "Temp. Exterior B2", metric: "TEMPERATURE", side: "EXTERIOR", isActive: true },
   });
-  await prisma.node.upsert({
-    where:  { hardwareId: "HUM-INT-002" },
-    update: {},
-    create: { shedId: shed.id, hardwareId: "HUM-INT-002", name: "Hum. Interior 2", type: "INTERIOR", metric: "HUMIDITY", isActive: true },
+  await prisma.sensor.upsert({
+    where:  { hardwareId: "B2-HUM-EXT" },
+    update: { side: "EXTERIOR", metric: "HUMIDITY", name: "Hum. Exterior B2" },
+    create: { nodeId: node2.id, hardwareId: "B2-HUM-EXT",  name: "Hum. Exterior B2",  metric: "HUMIDITY",    side: "EXTERIOR", isActive: true },
   });
+  // Bloque 2 — cara interior
+  await prisma.sensor.upsert({
+    where:  { hardwareId: "B2-TEMP-INT" },
+    update: { side: "INTERIOR", metric: "TEMPERATURE", name: "Temp. Interior B2" },
+    create: { nodeId: node2.id, hardwareId: "B2-TEMP-INT", name: "Temp. Interior B2", metric: "TEMPERATURE", side: "INTERIOR", isActive: true },
+  });
+  await prisma.sensor.upsert({
+    where:  { hardwareId: "B2-HUM-INT" },
+    update: { side: "INTERIOR", metric: "HUMIDITY", name: "Hum. Interior B2" },
+    create: { nodeId: node2.id, hardwareId: "B2-HUM-INT",  name: "Hum. Interior B2",  metric: "HUMIDITY",    side: "INTERIOR", isActive: true },
+  });
+  console.log("  ✅ Sensores     →  4 por bloque (ext/int × temp/hum)");
 
-  // Sensores exteriores (referencia ambiental)
-  await prisma.node.upsert({
-    where:  { hardwareId: "TEMP-EXT-001" },
-    update: {},
-    create: { shedId: shed.id, hardwareId: "TEMP-EXT-001", name: "Temp. Exterior", type: "EXTERIOR", metric: "TEMPERATURE", isActive: true },
-  });
-  await prisma.node.upsert({
-    where:  { hardwareId: "HUM-EXT-001" },
-    update: {},
-    create: { shedId: shed.id, hardwareId: "HUM-EXT-001", name: "Hum. Exterior", type: "EXTERIOR", metric: "HUMIDITY", isActive: true },
-  });
-  console.log("  ✅ Sensores     →  TEMP-INT-001/002, HUM-INT-001/002, TEMP-EXT-001, HUM-EXT-001");
-
-  // ── 8. Bombas — topic independiente, solo recibe on/off ─────────────────────
+  // ── 9. Bombas — una por bloque, riega ese bloque ─────────────────────────────
   await prisma.pump.upsert({
-    where:  { hardwareId: "PUMP-001" },
+    where:  { hardwareId: "PUMP-B1" },
     update: {},
-    create: { shedId: shed.id, hardwareId: "PUMP-001", name: "Bomba 1", pumpNumber: 1, isActive: true },
+    create: { nodeId: node1.id, hardwareId: "PUMP-B1", name: "Bomba Bloque 1", pumpNumber: 1, isActive: true },
   });
   await prisma.pump.upsert({
-    where:  { hardwareId: "PUMP-002" },
+    where:  { hardwareId: "PUMP-B2" },
     update: {},
-    create: { shedId: shed.id, hardwareId: "PUMP-002", name: "Bomba 2", pumpNumber: 2, isActive: true },
+    create: { nodeId: node2.id, hardwareId: "PUMP-B2", name: "Bomba Bloque 2", pumpNumber: 2, isActive: true },
   });
-  console.log("  ✅ Bombas       →  PUMP-001, PUMP-002");
+  console.log("  ✅ Bombas       →  PUMP-B1 (Bloque 1), PUMP-B2 (Bloque 2)");
 
-  // ── 9. Ventiladores — topic independiente, solo recibe on/off ───────────────
+  // ── 10. Ventiladores — del galpón, se activan si la humidificación no basta ──
   await prisma.fan.upsert({
     where:  { hardwareId: "FAN-001" },
     update: {},
@@ -148,7 +186,7 @@ async function main(): Promise<void> {
     update: {},
     create: { shedId: shed.id, hardwareId: "FAN-002", name: "Ventilador 2", fanNumber: 2, isActive: true },
   });
-  console.log("  ✅ Ventiladores →  FAN-001, FAN-002");
+  console.log("  ✅ Ventiladores →  FAN-001, FAN-002 (del galpón)");
 
   console.log("\n────────────────────────────────────────────────");
   console.log("  CREDENCIALES DE ACCESO");

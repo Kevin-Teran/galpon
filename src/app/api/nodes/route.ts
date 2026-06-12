@@ -1,9 +1,9 @@
 /**
  * @file route.ts
  * @route /src/app/api/nodes/route.ts
- * @description GET /api/nodes | POST — sensores (un topic = una métrica).
+ * @description GET /api/nodes | POST — nodos físicos de un galpón (contenedores de sensores).
  * @author Kevin Mariano
- * @version 2.0.0
+ * @version 3.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -15,11 +15,8 @@ import { requireRole, apiErrorResponse } from "@/shared/middleware/auth.middlewa
 import { Role } from "@/shared/types/roles";
 
 const createSchema = z.object({
-  shedId:    z.string().min(1),
-  hardwareId: z.string().min(1).max(100),
-  name:      z.string().min(2).max(100),
-  type:      z.enum(["INTERIOR", "EXTERIOR"]),
-  metric:    z.enum(["TEMPERATURE", "HUMIDITY"]),
+  shedId: z.string().min(1),
+  name:   z.string().min(2).max(100),
 });
 
 export async function GET(req: NextRequest) {
@@ -28,7 +25,12 @@ export async function GET(req: NextRequest) {
     const shedId = req.nextUrl.searchParams.get("shedId") ?? undefined;
     const nodes  = await prisma.node.findMany({
       where:   shedId ? { shedId } : {},
-      include: { shed: { select: { name: true } } },
+      include: {
+        shed:    { select: { name: true } },
+        sensors: { orderBy: { createdAt: "asc" } },
+        pumps:   { orderBy: { pumpNumber: "asc" } },
+        _count:  { select: { sensors: true, pumps: true } },
+      },
       orderBy: { createdAt: "asc" },
     });
     return Response.json(nodes);
@@ -40,7 +42,10 @@ export async function POST(req: NextRequest) {
     await requireRole(req, Role.ADMIN);
     const body = await req.json().catch(() => ({}));
     const data = createSchema.parse(body);
-    const node = await prisma.node.create({ data });
+    const node = await prisma.node.create({
+      data,
+      include: { _count: { select: { sensors: true, pumps: true } } },
+    });
     return Response.json(node, { status: 201 });
   } catch (err) { return apiErrorResponse(err); }
 }

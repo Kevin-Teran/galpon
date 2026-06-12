@@ -3,7 +3,7 @@
  * @route /src/app/api/sheds/[id]/route.ts
  * @description GET | PUT | DELETE /api/sheds/[id]
  * @author Kevin Mariano
- * @version 1.0.0
+ * @version 2.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -19,10 +19,8 @@ const updateSchema = z.object({
   name:        z.string().min(2).max(100).optional(),
   description: z.string().optional(),
   location:    z.string().optional(),
-  latitude:    z.number().optional(),
-  longitude:   z.number().optional(),
+  mapsUrl:     z.string().url().optional().or(z.literal("")),
   area:        z.number().positive().optional(),
-  fanCount:    z.number().int().min(0).optional(),
 });
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -32,9 +30,14 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const shed = await prisma.shed.findUnique({
       where: { id },
       include: {
-        nodes:  { orderBy: { createdAt: "asc" } },
-        pumps:  { orderBy: { pumpNumber: "asc" } },
-        fans:   { orderBy: { fanNumber: "asc" } },
+        nodes: {
+          orderBy: { createdAt: "asc" },
+          include: {
+            sensors: { orderBy: [{ side: "asc" }, { metric: "asc" }] },
+            pumps:   { orderBy: { pumpNumber: "asc" } },
+          },
+        },
+        fans:  { orderBy: { fanNumber: "asc" } },
         organization: { select: { name: true, alertRanges: true } },
       },
     });
@@ -48,8 +51,11 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     await requireRole(req, Role.ADMIN);
     const { id } = await params;
     const body   = await req.json().catch(() => ({}));
-    const data   = updateSchema.parse(body);
-    const shed   = await prisma.shed.update({ where: { id }, data });
+    const { mapsUrl, ...rest } = updateSchema.parse(body);
+    const shed   = await prisma.shed.update({
+      where: { id },
+      data:  { ...rest, ...(mapsUrl !== undefined && { mapsUrl: mapsUrl || null }) },
+    });
     return Response.json(shed);
   } catch (err) { return apiErrorResponse(err); }
 }

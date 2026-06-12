@@ -58,13 +58,13 @@ self.addEventListener("push", (event) => {
     data = { title: "Galpon", body: event.data.text() };
   }
 
-  const { title = "Galpon", body = "", icon = "/icons/icon-192.png", url = "/" } = data;
+  const { title = "Galpon", body = "", icon = "/icons/icon.svg", url = "/" } = data;
 
   event.waitUntil(
     self.registration.showNotification(title, {
       body,
       icon,
-      badge: "/icons/icon-192.png",
+      badge: "/icons/icon.svg",
       data: { url },
       requireInteraction: data.urgent ?? false,
     })

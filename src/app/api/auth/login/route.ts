@@ -36,9 +36,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     const useCase = new LoginUserUseCase(new PrismaUserRepository());
     const result  = await useCase.execute({ email, password });
 
-    // rememberMe → 30 días; normal → 15 min
-    const accessMaxAge  = rememberMe ? 60 * 60 * 24 * 30 : 900;
-    const refreshMaxAge = rememberMe ? 60 * 60 * 24 * 30 : 604800;
+    // rememberMe → 30 días; normal → 8h (suficiente para una jornada laboral)
+    const accessMaxAge  = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 8;
+    const refreshMaxAge = rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24 * 7;
     const secure = IS_PROD ? "; Secure" : "";
 
     const response = Response.json({ user: result.user }, { status: 200 });

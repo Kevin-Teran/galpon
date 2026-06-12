@@ -1,9 +1,9 @@
 /**
  * @file route.ts
  * @route /src/app/api/fans/route.ts
- * @description GET /api/fans | POST — listar y crear ventiladores.
+ * @description GET /api/fans | POST — ventiladores del galpón (independientes de los nodos).
  * @author Kevin Mariano
- * @version 1.0.0
+ * @version 3.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -15,7 +15,7 @@ import { requireRole, apiErrorResponse } from "@/shared/middleware/auth.middlewa
 import { Role } from "@/shared/types/roles";
 
 const createSchema = z.object({
-  shedId:    z.string(),
+  shedId:    z.string().min(1),
   hardwareId: z.string().min(1).max(100),
   name:      z.string().min(2).max(100),
   fanNumber: z.number().int().min(1),

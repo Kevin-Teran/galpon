@@ -1,7 +1,7 @@
 /**
  * @file route.ts
- * @route /src/app/api/pumps/[id]/route.ts
- * @description GET | PUT | DELETE /api/pumps/[id]
+ * @route /src/app/api/sensors/[id]/route.ts
+ * @description GET | PUT | DELETE /api/sensors/[id]
  * @author Kevin Mariano
  * @version 1.0.0
  * @since 1.0.0
@@ -16,10 +16,10 @@ import { Role } from "@/shared/types/roles";
 import { NotFoundError } from "@/shared/errors/NotFoundError";
 
 const updateSchema = z.object({
-  name:       z.string().min(2).max(100).optional(),
   hardwareId: z.string().min(1).max(100).optional(),
-  pumpNumber: z.number().int().min(1).optional(),
-  model:      z.string().max(100).optional(),
+  name:       z.string().min(2).max(100).optional(),
+  metric:     z.enum(["TEMPERATURE", "HUMIDITY"]).optional(),
+  side:       z.enum(["INTERIOR", "EXTERIOR"]).optional(),
   isActive:   z.boolean().optional(),
 });
 
@@ -27,9 +27,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   try {
     await requireRole(req, Role.OPERATOR);
     const { id } = await params;
-    const pump = await prisma.pump.findUnique({ where: { id }, include: { node: { select: { name: true } } } });
-    if (!pump) throw new NotFoundError("Bomba");
-    return Response.json(pump);
+    const sensor = await prisma.sensor.findUnique({
+      where:   { id },
+      include: {
+        node:         { select: { id: true, name: true, shedId: true, shed: { select: { id: true, name: true } } } },
+        measurements: { orderBy: { timestamp: "desc" }, take: 100 },
+        alerts:       { where: { resolvedAt: null }, orderBy: { createdAt: "desc" }, take: 10 },
+      },
+    });
+    if (!sensor) throw new NotFoundError("Sensor");
+    return Response.json(sensor);
   } catch (err) { return apiErrorResponse(err); }
 }
 
@@ -39,8 +46,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params;
     const body   = await req.json().catch(() => ({}));
     const data   = updateSchema.parse(body);
-    const pump   = await prisma.pump.update({ where: { id }, data });
-    return Response.json(pump);
+    const sensor = await prisma.sensor.update({ where: { id }, data });
+    return Response.json(sensor);
   } catch (err) { return apiErrorResponse(err); }
 }
 
@@ -48,7 +55,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   try {
     await requireRole(req, Role.ADMIN);
     const { id } = await params;
-    await prisma.pump.delete({ where: { id } });
+    await prisma.sensor.delete({ where: { id } });
     return Response.json({ ok: true });
   } catch (err) { return apiErrorResponse(err); }
 }

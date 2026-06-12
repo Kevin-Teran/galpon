@@ -3,9 +3,9 @@
  * @route /src/infrastructure/mqtt/MqttMessageHandler.ts
  * @description Despachador de mensajes MQTT entrantes.
  *              Arquitectura: un topic = un sensor = una sola métrica.
- *              El campo node.metric determina qué mide el sensor; no se infiere del payload.
+ *              El campo sensor.metric determina qué mide cada topic; no se infiere del payload.
  * @author Kevin Mariano
- * @version 2.0.0
+ * @version 3.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -16,18 +16,18 @@ import { prisma } from "@/shared/database/prisma.client";
 
 /** Inicia la escucha de todos los sensores activos y despacha mediciones al dominio. */
 export async function startMqttMessageHandler(): Promise<void> {
-  const nodes = await prisma.node.findMany({
+  const sensors = await prisma.sensor.findMany({
     where:  { isActive: true },
     select: { hardwareId: true, metric: true },
   });
 
-  if (nodes.length === 0) {
+  if (sensors.length === 0) {
     console.info("[MQTT] Sin sensores activos para suscribirse");
     return;
   }
 
   const mqttClient = getMqttClient();
-  const topics     = nodes.map(n => n.hardwareId);
+  const topics     = sensors.map(s => s.hardwareId);
 
   mqttClient.subscribe(topics, { qos: 1 }, (err) => {
     if (err) console.error("[MQTT] Error al suscribirse:", err.message);
@@ -35,7 +35,7 @@ export async function startMqttMessageHandler(): Promise<void> {
   });
 
   // Mapa en memoria hardwareId → métrica para evitar una query por mensaje
-  const metricByTopic = new Map(nodes.map(n => [n.hardwareId, n.metric]));
+  const metricByTopic = new Map(sensors.map(s => [s.hardwareId, s.metric]));
 
   mqttClient.on("message", async (topic, payload) => {
     const raw = payload.toString().trim();
@@ -64,15 +64,15 @@ async function handleSensorReading(
     return;
   }
 
-  const node = await prisma.node.findUnique({
+  const sensor = await prisma.sensor.findUnique({
     where:   { hardwareId },
-    include: { shed: { select: { organizationId: true } } },
+    include: { node: { select: { shed: { select: { organizationId: true } } } } },
   });
 
-  if (!node) return;
+  if (!sensor) return;
 
   await prisma.measurement.create({
-    data: { nodeId: node.id, metric: node.metric, value, timestamp: new Date() },
+    data: { sensorId: sensor.id, metric: sensor.metric, value, timestamp: new Date() },
   });
 
   console.info(`[MQTT] ${hardwareId} (${metric}) → ${value}`);

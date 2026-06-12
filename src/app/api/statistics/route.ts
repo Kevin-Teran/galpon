@@ -3,7 +3,7 @@
  * @route /src/app/api/statistics/route.ts
  * @description GET /api/statistics — estadísticas de uso de dispositivos y mediciones.
  * @author Kevin Mariano
- * @version 1.0.0
+ * @version 2.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -19,9 +19,12 @@ export async function GET(req: NextRequest) {
     const sp      = req.nextUrl.searchParams;
     const shedId  = sp.get("shedId") ?? undefined;
 
-    const nodeWhere  = shedId ? { shedId } : {};
     const alertWhere = payload.role !== Role.SUPER_ADMIN
       ? { organizationId: payload.organizationId! }
+      : {};
+
+    const deviceWhere = shedId
+      ? { OR: [{ pump: { node: { shedId } } }, { fan: { shedId } }] } as object
       : {};
 
     const [
@@ -33,7 +36,7 @@ export async function GET(req: NextRequest) {
       prisma.alert.count({ where: alertWhere }),
       prisma.alert.count({ where: { ...alertWhere, resolvedAt: null } }),
       prisma.deviceEvent.findMany({
-        where:   { ...(shedId && { node: { shedId } }), endedAt: { not: null } },
+        where:   { ...deviceWhere, endedAt: { not: null } },
         orderBy: { startedAt: "desc" },
         take:    50,
         select: {
@@ -42,10 +45,16 @@ export async function GET(req: NextRequest) {
         },
       }),
       prisma.measurement.findMany({
-        where:   { node: nodeWhere },
+        where:   { sensor: { node: shedId ? { shedId } : {} } },
         orderBy: { timestamp: "desc" },
         take:    200,
-        select:  { nodeId: true, metric: true, value: true, timestamp: true, node: { select: { name: true } } },
+        select: {
+          sensorId:  true,
+          metric:    true,
+          value:     true,
+          timestamp: true,
+          sensor:    { select: { name: true } },
+        },
       }),
     ]);
 
@@ -55,8 +64,8 @@ export async function GET(req: NextRequest) {
     }, {});
 
     return Response.json({
-      alerts: { total: totalAlerts, open: openAlerts },
-      devices: { events: deviceEvents, totalDurationByType },
+      alerts:       { total: totalAlerts, open: openAlerts },
+      devices:      { events: deviceEvents, totalDurationByType },
       measurements: lastMeasurements,
     });
   } catch (err) { return apiErrorResponse(err); }

@@ -3,7 +3,7 @@
  * @route /src/app/api/nodes/[id]/route.ts
  * @description GET | PUT | DELETE /api/nodes/[id]
  * @author Kevin Mariano
- * @version 1.0.0
+ * @version 2.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -17,8 +17,6 @@ import { NotFoundError } from "@/shared/errors/NotFoundError";
 
 const updateSchema = z.object({
   name:     z.string().min(2).max(100).optional(),
-  type:     z.enum(["INTERIOR", "EXTERIOR"]).optional(),
-  metric:   z.enum(["TEMPERATURE", "HUMIDITY"]).optional(),
   isActive: z.boolean().optional(),
 });
 
@@ -29,8 +27,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const node = await prisma.node.findUnique({
       where: { id },
       include: {
-        measurements: { orderBy: { timestamp: "desc" }, take: 20 },
-        shed: { select: { name: true } },
+        sensors: { orderBy: { createdAt: "asc" } },
+        pumps:   { orderBy: { pumpNumber: "asc" } },
+        shed:    { select: { id: true, name: true } },
       },
     });
     if (!node) throw new NotFoundError("Nodo");

@@ -3,7 +3,7 @@
  * @route /src/app/api/sheds/route.ts
  * @description GET /api/sheds | POST — listar y crear galpones.
  * @author Kevin Mariano
- * @version 1.0.0
+ * @version 2.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -19,10 +19,8 @@ const createSchema = z.object({
   name:           z.string().min(2).max(100),
   description:    z.string().optional(),
   location:       z.string().optional(),
-  latitude:       z.number().optional(),
-  longitude:      z.number().optional(),
+  mapsUrl:        z.string().url().optional().or(z.literal("")),
   area:           z.number().positive().optional(),
-  fanCount:       z.number().int().min(0).default(0),
 });
 
 export async function GET(req: NextRequest) {
@@ -34,7 +32,10 @@ export async function GET(req: NextRequest) {
 
     const sheds = await prisma.shed.findMany({
       where:   orgId ? { organizationId: orgId } : {},
-      include: { _count: { select: { nodes: true, fans: true } }, organization: { select: { name: true } } },
+      include: {
+        _count:       { select: { nodes: true, fans: true } },
+        organization: { select: { name: true } },
+      },
       orderBy: { createdAt: "desc" },
     });
     return Response.json(sheds);
@@ -45,12 +46,14 @@ export async function POST(req: NextRequest) {
   try {
     const payload = await requireRole(req, Role.ADMIN);
     const body    = await req.json().catch(() => ({}));
-    const data    = createSchema.parse(body);
+    const { mapsUrl, ...rest } = createSchema.parse(body);
 
-    if (payload.role !== Role.SUPER_ADMIN && payload.organizationId !== data.organizationId)
+    if (payload.role !== Role.SUPER_ADMIN && payload.organizationId !== rest.organizationId)
       return Response.json({ error: "Sin acceso a esta organización" }, { status: 403 });
 
-    const shed = await prisma.shed.create({ data });
+    const shed = await prisma.shed.create({
+      data: { ...rest, mapsUrl: mapsUrl || null },
+    });
     return Response.json(shed, { status: 201 });
   } catch (err) { return apiErrorResponse(err); }
 }

@@ -11,11 +11,13 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export function LoginForm() {
-  const router = useRouter();
+  const router       = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo   = searchParams.get("from") ?? "/dashboard";
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [showPass, setShowPass] = useState(false);
@@ -40,7 +42,7 @@ export function LoginForm() {
           setError(data.error ?? "Error al iniciar sesión");
           return;
         }
-        router.push("/dashboard");
+        router.push(redirectTo);
         router.refresh();
       } catch {
         setError("Error de conexión. Intenta nuevamente.");

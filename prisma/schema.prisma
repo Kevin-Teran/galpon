@@ -18,7 +18,10 @@ enum Role {
   OPERATOR
 }
 
-enum NodeType {
+/// Cara del bloque hacia la que apunta el sensor.
+/// EXTERIOR = cara que da al exterior del galpón.
+/// INTERIOR = cara que da al interior del galpón.
+enum SensorSide {
   INTERIOR
   EXTERIOR
 }
@@ -99,45 +102,61 @@ model Shed {
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   name           String
   description    String?
-  location       String?
-  latitude       Float?
-  longitude      Float?
+  location       String?      // dirección / texto de ubicación
+  mapsUrl        String?      // enlace de Google Maps
   area           Float?       // área en m²
-  fanCount       Int          @default(0)
   nodes          Node[]
-  pumps          Pump[]
-  fans           Fan[]
+  fans           Fan[]        // ventiladores del galpón (independientes de los nodos)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
   @@map("sheds")
 }
 
-/// Un topic MQTT = un sensor = una sola métrica.
-/// type indica dónde está instalado el sensor físicamente.
+/// Nodo: dispositivo físico (ESP32/Arduino) embebido en un bloque del galpón.
+/// Cada nodo agrupa los 4 sensores de ese bloque (temp/hum × interior/exterior)
+/// y la bomba que riega ese bloque para humidificar el interior.
 model Node {
+  id        String   @id @default(cuid())
+  shedId    String
+  shed      Shed     @relation(fields: [shedId], references: [id], onDelete: Cascade)
+  name      String
+  isActive  Boolean  @default(true)
+  sensors   Sensor[]
+  pumps     Pump[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("nodes")
+}
+
+/// Sensor: un topic MQTT = una sola métrica en un lado específico del bloque.
+/// Cada nodo tiene 4 sensores: TEMPERATURE+INTERIOR, HUMIDITY+INTERIOR,
+///                             TEMPERATURE+EXTERIOR, HUMIDITY+EXTERIOR.
+model Sensor {
   id           String        @id @default(cuid())
-  shedId       String
-  shed         Shed          @relation(fields: [shedId], references: [id], onDelete: Cascade)
-  hardwareId   String        @unique
+  nodeId       String
+  node         Node          @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  hardwareId   String        @unique  // = topic MQTT
   name         String
-  type         NodeType      // INTERIOR | EXTERIOR — ubicación física del sensor
-  metric       Metric        // TEMPERATURE | HUMIDITY — única métrica que publica
+  metric       Metric        // TEMPERATURE | HUMIDITY
+  side         SensorSide    // INTERIOR | EXTERIOR — cara del bloque
   isActive     Boolean       @default(true)
   measurements Measurement[]
   alerts       Alert[]
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  @@map("nodes")
+  @@map("sensors")
 }
 
-/// Bomba de agua — topic independiente, solo recibe on/off.
+/// Bomba de agua — riega el bloque al que pertenece el nodo para humidificar.
+/// Recibe comandos on/off por su propio topic MQTT; no publica lecturas.
 model Pump {
   id          String        @id @default(cuid())
-  shedId      String
-  shed        Shed          @relation(fields: [shedId], references: [id], onDelete: Cascade)
-  hardwareId  String        @unique
+  nodeId      String
+  node        Node          @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  hardwareId  String        @unique  // = topic MQTT
   name        String
   pumpNumber  Int
   model       String?
@@ -149,11 +168,14 @@ model Pump {
   @@map("pumps")
 }
 
+/// Ventilador — pertenece al galpón directamente (no a un nodo).
+/// Se activa cuando la humidificación por bombas no es suficiente.
+/// Recibe comandos on/off por su propio topic MQTT.
 model Fan {
   id          String        @id @default(cuid())
   shedId      String
   shed        Shed          @relation(fields: [shedId], references: [id], onDelete: Cascade)
-  hardwareId  String        @unique
+  hardwareId  String        @unique  // = topic MQTT
   name        String
   fanNumber   Int
   model       String?
@@ -167,13 +189,13 @@ model Fan {
 
 model Measurement {
   id        String   @id @default(cuid())
-  nodeId    String
-  node      Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  sensorId  String
+  sensor    Sensor   @relation(fields: [sensorId], references: [id], onDelete: Cascade)
   metric    Metric
   value     Float
   timestamp DateTime @default(now())
 
-  @@index([nodeId, metric, timestamp])
+  @@index([sensorId, metric, timestamp])
   @@map("measurements")
 }
 
@@ -201,8 +223,8 @@ model Alert {
   id             String       @id @default(cuid())
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  nodeId         String
-  node           Node         @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  sensorId       String
+  sensor         Sensor       @relation(fields: [sensorId], references: [id], onDelete: Cascade)
   metric         Metric
   alertLevel     AlertLevel
   value          Float
@@ -210,7 +232,7 @@ model Alert {
   resolvedAt     DateTime?
 
   @@index([organizationId, createdAt])
-  @@index([nodeId, createdAt])
+  @@index([sensorId, createdAt])
   @@map("alerts")
 }
 
