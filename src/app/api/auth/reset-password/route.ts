@@ -10,6 +10,7 @@
 
 import { NextRequest } from "next/server";
 import { z } from "zod";
+import crypto from "crypto";
 import { prisma } from "@/shared/database/prisma.client";
 import { hashPassword } from "@/authentication/infrastructure/BcryptPasswordService";
 import { apiErrorResponse } from "@/shared/middleware/auth.middleware";
@@ -28,10 +29,11 @@ export async function POST(req: NextRequest): Promise<Response> {
     if (!parsed.success) throw new ValidationError("Datos inválidos");
 
     const { token, password } = parsed.data;
+    const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
 
     const user = await prisma.user.findFirst({
       where: {
-        resetPasswordToken: token,
+        resetPasswordToken: tokenHash,
         resetPasswordExpiry: { gt: new Date() },
       },
       select: { id: true },

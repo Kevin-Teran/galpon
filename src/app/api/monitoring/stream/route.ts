@@ -3,8 +3,9 @@
  * @route /src/app/api/monitoring/stream/route.ts
  * @description GET /api/monitoring/stream — Server-Sent Events con las últimas lecturas de sensores.
  *              Emite cada 5 s un snapshot con las mediciones más recientes por sensor.
+ *              Las mediciones se filtran por organizationId del usuario autenticado.
  * @author Kevin Mariano
- * @version 2.0.0
+ * @version 3.0.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -12,12 +13,18 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/shared/database/prisma.client";
 import { requireAuth } from "@/shared/middleware/auth.middleware";
+import { Role } from "@/shared/types/roles";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
+  let organizationId: string | null = null;
+  let isSuperAdmin = false;
+
   try {
-    await requireAuth(req);
+    const payload = await requireAuth(req);
+    organizationId = payload.organizationId;
+    isSuperAdmin   = (payload.role as Role) === Role.SUPER_ADMIN;
   } catch {
     return new Response("Unauthorized", { status: 401 });
   }
@@ -26,6 +33,11 @@ export async function GET(req: NextRequest) {
   const encoder = new TextEncoder();
   let closed    = false;
 
+  // Filtro base de organización — SUPER_ADMIN puede ver todo
+  const orgFilter = !isSuperAdmin && organizationId
+    ? { shed: { organizationId } }
+    : {};
+
   const stream = new ReadableStream({
     async start(controller) {
       async function emit() {
@@ -33,7 +45,7 @@ export async function GET(req: NextRequest) {
         try {
           const measurements = await prisma.measurement.findMany({
             where: {
-              sensor:    { node: shedId ? { shedId } : {} },
+              sensor:    { node: { ...orgFilter, ...(shedId ? { shedId } : {}) } },
               timestamp: { gte: new Date(Date.now() - 60_000) },
             },
             orderBy: { timestamp: "desc" },
@@ -57,7 +69,8 @@ export async function GET(req: NextRequest) {
           const openAlerts = await prisma.alert.count({
             where: {
               resolvedAt: null,
-              ...(shedId && { sensor: { node: { shedId } } }),
+              ...(!isSuperAdmin && organizationId ? { organizationId } : {}),
+              ...(shedId ? { sensor: { node: { shedId } } } : {}),
             },
           });
 

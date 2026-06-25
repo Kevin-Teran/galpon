@@ -3,7 +3,7 @@
  * @route /src/app/api/sheds/[id]/route.ts
  * @description GET | PUT | DELETE /api/sheds/[id]
  * @author Kevin Mariano
- * @version 2.0.0
+ * @version 2.1.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -14,6 +14,7 @@ import { prisma } from "@/shared/database/prisma.client";
 import { requireRole, apiErrorResponse } from "@/shared/middleware/auth.middleware";
 import { Role } from "@/shared/types/roles";
 import { NotFoundError } from "@/shared/errors/NotFoundError";
+import { JwtPayload } from "@/authentication/infrastructure/JwtTokenService";
 
 const updateSchema = z.object({
   name:        z.string().min(2).max(100).optional(),
@@ -23,12 +24,17 @@ const updateSchema = z.object({
   area:        z.number().positive().optional(),
 });
 
+function orgWhere(p: JwtPayload) {
+  if ((p.role as Role) === Role.SUPER_ADMIN || !p.organizationId) return {};
+  return { organizationId: p.organizationId };
+}
+
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireRole(req, Role.OPERATOR);
-    const { id } = await params;
-    const shed = await prisma.shed.findUnique({
-      where: { id },
+    const payload = await requireRole(req, Role.OPERATOR);
+    const { id }  = await params;
+    const shed    = await prisma.shed.findFirst({
+      where: { id, ...orgWhere(payload) },
       include: {
         nodes: {
           orderBy: { createdAt: "asc" },
@@ -48,11 +54,15 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireRole(req, Role.ADMIN);
-    const { id } = await params;
-    const body   = await req.json().catch(() => ({}));
+    const payload = await requireRole(req, Role.ADMIN);
+    const { id }  = await params;
+    const body    = await req.json().catch(() => ({}));
     const { mapsUrl, ...rest } = updateSchema.parse(body);
-    const shed   = await prisma.shed.update({
+
+    const exists = await prisma.shed.findFirst({ where: { id, ...orgWhere(payload) }, select: { id: true } });
+    if (!exists) throw new NotFoundError("Galpón");
+
+    const shed = await prisma.shed.update({
       where: { id },
       data:  { ...rest, ...(mapsUrl !== undefined && { mapsUrl: mapsUrl || null }) },
     });
@@ -62,8 +72,12 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    await requireRole(req, Role.ADMIN);
-    const { id } = await params;
+    const payload = await requireRole(req, Role.ADMIN);
+    const { id }  = await params;
+
+    const exists = await prisma.shed.findFirst({ where: { id, ...orgWhere(payload) }, select: { id: true } });
+    if (!exists) throw new NotFoundError("Galpón");
+
     await prisma.shed.delete({ where: { id } });
     return Response.json({ ok: true });
   } catch (err) { return apiErrorResponse(err); }

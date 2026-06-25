@@ -58,11 +58,25 @@ enum EventReason {
   SCHEDULE
 }
 
+enum ThemePreference {
+  DARK
+  LIGHT
+  SYSTEM
+}
+
+enum SessionEndReason {
+  LOGOUT
+  PASSWORD_RESET
+}
+
 // ─── Models ──────────────────────────────────────────────────────────────────
 
 model Organization {
   id          String       @id @default(cuid())
   name        String
+  description String?
+  location    String?
+  phone       String?
   alertRanges AlertRange[]
   sheds       Shed[]
   users       User[]
@@ -237,32 +251,58 @@ model Alert {
 }
 
 model User {
-  id                    String        @id @default(cuid())
-  email                 String        @unique
+  id                    String          @id @default(cuid())
+  email                 String          @unique
   passwordHash          String
   name                  String
   role                  Role
   organizationId        String?
-  organization          Organization? @relation(fields: [organizationId], references: [id])
+  organization          Organization?   @relation(fields: [organizationId], references: [id])
   pushSubscription      Json?
-  resetPasswordToken    String?       @unique
+  resetPasswordToken    String?         @unique
   resetPasswordExpiry   DateTime?
+  themePreference       ThemePreference @default(SYSTEM)
+  loginCount            Int             @default(0)
   sessions              UserSession[]
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime      @updatedAt
+  auditLogs             AuditLog[]
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
 
   @@map("users")
 }
 
 /// Sesiones JWT. jti permite invalidar tokens individuales (logout).
+/// Registra metadatos de auditoría: IP, user-agent, motivo de cierre y duración.
 model UserSession {
-  id        String   @id @default(cuid())
+  id        String            @id @default(cuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  jti       String   @unique
+  user      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jti       String            @unique
   expiresAt DateTime
-  createdAt DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+  endedAt   DateTime?
+  endReason SessionEndReason?
+  createdAt DateTime          @default(now())
 
   @@index([userId])
   @@map("user_sessions")
+}
+
+/// Registro de auditoría: acciones del sistema, errores y eventos de seguridad.
+model AuditLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  organizationId String?
+  action         String   // LOGIN_SUCCESS | LOGIN_FAILED | LOGOUT | PASSWORD_RESET_REQUEST | PASSWORD_RESET_COMPLETE | TOKEN_INVALID
+  ipAddress      String?
+  userAgent      String?
+  statusCode     Int?
+  details        Json?
+  createdAt      DateTime @default(now())
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
+  @@map("audit_logs")
 }

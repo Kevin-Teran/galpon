@@ -9,20 +9,13 @@
  * @copyright Galpon
  */
 
-import { Sidebar } from "./_components/Sidebar";
-import { Header } from "./_components/Header";
 import { AuthGuard } from "./_components/AuthGuard";
+import { PlatformShell } from "./_components/PlatformShell";
 
 export default function PlatformLayout({ children }: { children: React.ReactNode }) {
   return (
     <AuthGuard>
-      <div className="flex h-screen overflow-hidden">
-        <Sidebar />
-        <div className="flex flex-col flex-1 overflow-hidden">
-          <Header />
-          <main className="flex-1 overflow-y-auto p-6">{children}</main>
-        </div>
-      </div>
+      <PlatformShell>{children}</PlatformShell>
     </AuthGuard>
   );
 }

@@ -33,16 +33,17 @@ export async function POST(req: NextRequest): Promise<Response> {
     // Responder siempre OK (no revelar si el email existe)
     if (!user) return Response.json({ ok: true }, { status: 200 });
 
-    const token   = crypto.randomBytes(32).toString("hex");
-    const expiry  = new Date(Date.now() + TOKEN_TTL_MS);
+    const rawToken    = crypto.randomBytes(32).toString("hex");
+    const tokenHash   = crypto.createHash("sha256").update(rawToken).digest("hex");
+    const expiry      = new Date(Date.now() + TOKEN_TTL_MS);
 
     await prisma.user.update({
       where: { id: user.id },
-      data: { resetPasswordToken: token, resetPasswordExpiry: expiry },
+      data: { resetPasswordToken: tokenHash, resetPasswordExpiry: expiry },
     });
 
     const appUrl    = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    const resetLink = `${appUrl}/reset-password?token=${token}`;
+    const resetLink = `${appUrl}/reset-password?token=${rawToken}`;
 
     if (process.env.SMTP_HOST) {
       const nodemailer = (await import("nodemailer")).default;
@@ -63,8 +64,7 @@ export async function POST(req: NextRequest): Promise<Response> {
           <p>Este enlace expira en 1 hora. Si no solicitaste esto, ignora este correo.</p>
         `,
       });
-    } else {
-      // Sin SMTP configurado: loguear el link (solo desarrollo)
+    } else if (process.env.NODE_ENV !== "production") {
       console.info(`[RESET] Link para ${user.email}: ${resetLink}`);
     }
 

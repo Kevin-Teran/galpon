@@ -3,7 +3,7 @@
  * @route /src/app/api/fans/route.ts
  * @description GET /api/fans | POST — ventiladores del galpón (independientes de los nodos).
  * @author Kevin Mariano
- * @version 3.0.0
+ * @version 3.1.0
  * @since 1.0.0
  * @copyright Galpon
  */
@@ -15,19 +15,24 @@ import { requireRole, apiErrorResponse } from "@/shared/middleware/auth.middlewa
 import { Role } from "@/shared/types/roles";
 
 const createSchema = z.object({
-  shedId:    z.string().min(1),
+  shedId:     z.string().min(1),
   hardwareId: z.string().min(1).max(100),
-  name:      z.string().min(2).max(100),
-  fanNumber: z.number().int().min(1),
-  model:     z.string().max(100).optional(),
+  name:       z.string().min(2).max(100),
+  fanNumber:  z.number().int().min(1),
+  model:      z.string().max(100).optional(),
 });
 
 export async function GET(req: NextRequest) {
   try {
-    await requireRole(req, Role.OPERATOR);
-    const shedId = req.nextUrl.searchParams.get("shedId") ?? undefined;
-    const fans   = await prisma.fan.findMany({
-      where:   shedId ? { shedId } : {},
+    const payload    = await requireRole(req, Role.OPERATOR);
+    const shedId     = req.nextUrl.searchParams.get("shedId") ?? undefined;
+    const isSuperAdmin = (payload.role as Role) === Role.SUPER_ADMIN;
+    const orgFilter  = !isSuperAdmin && payload.organizationId
+      ? { shed: { organizationId: payload.organizationId } }
+      : {};
+
+    const fans = await prisma.fan.findMany({
+      where:   { ...(shedId ? { shedId } : {}), ...orgFilter },
       include: { shed: { select: { name: true } } },
       orderBy: { fanNumber: "asc" },
     });
@@ -37,10 +42,19 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    await requireRole(req, Role.ADMIN);
-    const body = await req.json().catch(() => ({}));
-    const data = createSchema.parse(body);
-    const fan  = await prisma.fan.create({ data });
+    const payload = await requireRole(req, Role.ADMIN);
+    const body    = await req.json().catch(() => ({}));
+    const data    = createSchema.parse(body);
+
+    if ((payload.role as Role) !== Role.SUPER_ADMIN) {
+      const shed = await prisma.shed.findFirst({
+        where: { id: data.shedId, organizationId: payload.organizationId! },
+        select: { id: true },
+      });
+      if (!shed) return Response.json({ error: "Sin acceso a este galpón" }, { status: 403 });
+    }
+
+    const fan = await prisma.fan.create({ data });
     return Response.json(fan, { status: 201 });
   } catch (err) { return apiErrorResponse(err); }
 }
