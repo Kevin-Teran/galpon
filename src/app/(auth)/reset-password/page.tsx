@@ -177,7 +177,8 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="w-full space-y-8">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-10 bg-(--bg-base)">
+    <div className="w-full max-w-[420px] space-y-8">
       {/* Logo + título */}
       <div className="flex flex-col items-center text-center space-y-4">
         <div className="relative">
@@ -215,6 +216,7 @@ export default function ResetPasswordPage() {
           <ResetPasswordForm />
         </Suspense>
       </div>
+    </div>
     </div>
   );
 }

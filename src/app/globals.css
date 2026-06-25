@@ -46,3 +46,11 @@ body {
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
 ::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 9999px; }
+
+/* ── Animación login panel izquierdo ─────────────────────────────────────── */
+@keyframes auth-flow {
+  0%   { left: -8%;  opacity: 0; }
+  12%  { opacity: 1; }
+  88%  { opacity: 1; }
+  100% { left: 108%; opacity: 0; }
+}
