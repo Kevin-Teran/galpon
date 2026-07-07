@@ -12,6 +12,8 @@
 
 import { usePathname } from "next/navigation";
 import { ThemeToggle } from "@/app/_components/ThemeToggle";
+import { NotificationBell } from "./NotificationBell";
+import { ProfileMenu } from "./ProfileMenu";
 
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   "/dashboard":     { title: "Dashboard",      subtitle: "Resumen general de la operación"    },
@@ -31,38 +33,29 @@ function getPageInfo(pathname: string) {
   return { title: "Galpon", subtitle: "" };
 }
 
-export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
+export function Header() {
   const pathname = usePathname();
   const { title, subtitle } = getPageInfo(pathname);
 
   return (
-    <header className="h-14 flex items-center justify-between px-4 sm:px-6 border-b border-(--border) bg-(--bg-surface) shrink-0 gap-3">
-      {/* Left — hamburger (mobile) + page title */}
-      <div className="flex items-center gap-3 min-w-0">
-        {/* Hamburger — only on mobile */}
-        <button
-          onClick={onMenuClick}
-          className="lg:hidden shrink-0 p-1.5 rounded-lg text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-subtle) transition-colors"
-          aria-label="Abrir menú"
-        >
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
-        </button>
-
-        <div className="flex items-baseline gap-3 min-w-0">
-          <h1 className="text-base font-semibold text-(--text-primary) truncate">{title}</h1>
-          {subtitle && (
-            <>
-              <span className="hidden md:block w-px h-3.5 bg-(--border) shrink-0" />
-              <p className="hidden md:block text-sm text-(--text-muted) truncate">{subtitle}</p>
-            </>
-          )}
-        </div>
+    <header className="h-16 flex items-center justify-between px-4 sm:px-6 border-b border-(--border) bg-(--bg-surface)/95 backdrop-blur-md shrink-0 gap-3 sticky top-0 z-20">
+      {/* Left — page title */}
+      <div className="flex-1 min-w-0">
+        <h1 className="text-[19px] font-bold tracking-tight text-(--text-primary) truncate">{title}</h1>
+        {subtitle && (
+          <p className="hidden md:flex items-center gap-1.5 text-xs text-(--text-muted) truncate mt-0.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-[breathe_2s_ease_infinite]" />
+            {subtitle}
+          </p>
+        )}
       </div>
 
-      {/* Right — theme toggle */}
-      <ThemeToggle />
+      {/* Right — tema, alertas, perfil */}
+      <div className="flex items-center gap-2 shrink-0">
+        <ThemeToggle />
+        <NotificationBell />
+        <ProfileMenu />
+      </div>
     </header>
   );
 }

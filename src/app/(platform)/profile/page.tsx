@@ -53,7 +53,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition disabled:opacity-50 disabled:cursor-not-allowed"
+      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition disabled:opacity-50 disabled:cursor-not-allowed"
     />
   );
 }
@@ -80,7 +80,7 @@ function SubmitButton({ pending, label, pendingLabel }: { pending: boolean; labe
     <button
       type="submit"
       disabled={pending}
-      className="flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]"
+      className="flex items-center gap-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-500 hover:to-amber-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-[0.98]"
     >
       {pending && (
         <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden>
@@ -204,14 +204,14 @@ export default function ProfilePage() {
 
       {/* Profile card */}
       <div className="rounded-2xl border border-(--border) bg-(--bg-surface) p-6 flex items-center gap-5">
-        <div className="w-14 h-14 rounded-2xl bg-emerald-500/15 flex items-center justify-center shrink-0">
-          <span className="text-2xl font-bold text-emerald-400">{initial}</span>
+        <div className="w-14 h-14 rounded-2xl bg-amber-500/15 flex items-center justify-center shrink-0">
+          <span className="text-2xl font-bold text-amber-400">{initial}</span>
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="text-lg font-semibold text-(--text-primary) truncate">{profile?.name}</h2>
           <p className="text-sm text-(--text-secondary) truncate">{profile?.email}</p>
           <div className="flex items-center gap-3 mt-1.5">
-            <span className="inline-flex items-center rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-400">
+            <span className="inline-flex items-center rounded-full bg-amber-500/10 px-2.5 py-0.5 text-[11px] font-semibold text-amber-400">
               {ROLE_LABELS[profile?.role ?? ""] ?? profile?.role}
             </span>
             {memberSince && (

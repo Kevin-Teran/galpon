@@ -77,7 +77,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input {...props}
-      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition disabled:opacity-50"
+      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition disabled:opacity-50"
     />
   );
 }
@@ -85,7 +85,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
 function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <textarea {...props} rows={3}
-      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition resize-none"
+      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition resize-none"
     />
   );
 }
@@ -310,7 +310,7 @@ export default function OrganizationsPage() {
       <div className="flex items-center justify-between gap-4">
         <p className="text-sm text-(--text-muted) shrink-0">Fincas y organizaciones registradas en el sistema</p>
         <button onClick={openCreate}
-          className="shrink-0 flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 transition-all duration-200 active:scale-[0.98]"
+          className="shrink-0 flex items-center gap-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-500 hover:to-amber-400 transition-all duration-200 active:scale-[0.98]"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -327,7 +327,7 @@ export default function OrganizationsPage() {
           </svg>
           <input type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre o ubicación…"
-            className="w-full rounded-xl border border-(--border) bg-(--bg-surface) pl-9 pr-8 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition"
+            className="w-full rounded-xl border border-(--border) bg-(--bg-surface) pl-9 pr-8 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition"
           />
           {search && (
             <button onClick={() => setSearch("")}
@@ -339,7 +339,7 @@ export default function OrganizationsPage() {
           )}
         </div>
         <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))}
-          className="rounded-xl border border-(--border) bg-(--bg-surface) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition">
+          className="rounded-xl border border-(--border) bg-(--bg-surface) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition">
           <option value={10}>10 por página</option>
           <option value={25}>25 por página</option>
           <option value={50}>50 por página</option>
@@ -357,7 +357,7 @@ export default function OrganizationsPage() {
             </svg>
             <p className="text-sm">{orgs.length === 0 ? "No hay organizaciones registradas" : "Sin resultados para la búsqueda"}</p>
             {orgs.length > 0 && (
-              <button onClick={() => setSearch("")} className="text-xs text-emerald-400 hover:underline">Limpiar búsqueda</button>
+              <button onClick={() => setSearch("")} className="text-xs text-amber-400 hover:underline">Limpiar búsqueda</button>
             )}
           </div>
         ) : (
@@ -379,8 +379,8 @@ export default function OrganizationsPage() {
                   <tr key={o.id} className="hover:bg-(--bg-subtle)/50 transition-colors">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
-                          <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden>
+                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+                          <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
                           </svg>
                         </div>
@@ -495,7 +495,7 @@ export default function OrganizationsPage() {
                     item === "…"
                       ? <span key={`e-${idx}`} className="px-1 text-(--text-muted) select-none">…</span>
                       : <button key={item} onClick={() => setPage(item as number)}
-                          className={`min-w-7 h-7 rounded-lg text-xs font-medium transition-colors ${page === item ? "bg-emerald-500/15 text-emerald-400 font-semibold" : "text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-subtle)"}`}>
+                          className={`min-w-7 h-7 rounded-lg text-xs font-medium transition-colors ${page === item ? "bg-amber-500/15 text-amber-400 font-semibold" : "text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-subtle)"}`}>
                           {(item as number) + 1}
                         </button>
                   )
@@ -547,7 +547,7 @@ export default function OrganizationsPage() {
                 Cancelar
               </button>
               <button type="submit" disabled={savePending}
-                className="flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
+                className="flex items-center gap-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-500 hover:to-amber-400 disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
               >
                 {savePending && <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>}
                 {savePending ? "Guardando…" : editing ? "Guardar cambios" : "Crear organización"}

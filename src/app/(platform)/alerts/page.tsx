@@ -66,7 +66,7 @@ export default function AlertsPage() {
           <div className="flex rounded-lg border border-[var(--border)] overflow-hidden text-sm">
             {(["open","all"] as const).map(f => (
               <button key={f} onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 transition ${filter === f ? "bg-emerald-600 text-white" : "text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]"}`}>
+                className={`px-3 py-1.5 transition ${filter === f ? "bg-amber-600 text-white" : "text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)]"}`}>
                 {f === "open" ? "Activas" : "Todas"}
               </button>
             ))}
@@ -112,7 +112,7 @@ export default function AlertsPage() {
                 <td className="px-4 py-3">
                   {!a.resolvedAt && (
                     <button onClick={() => resolve(a.id)} disabled={isPending}
-                      className="text-xs text-emerald-500 hover:text-emerald-400 transition disabled:opacity-50">
+                      className="text-xs text-amber-500 hover:text-amber-400 transition disabled:opacity-50">
                       Resolver
                     </button>
                   )}

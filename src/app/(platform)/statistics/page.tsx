@@ -75,7 +75,7 @@ export default function StatisticsPage() {
           { label: "Alertas totales",    value: stats.alerts.total,  sub: `${stats.alerts.open} activas`,       color: "text-red-400" },
           { label: "Bombas activadas",   value: pumpsActivations,    sub: fmtDuration(pumpMs) + " total",       color: "text-blue-400" },
           { label: "Ventiladores activ.", value: fansActivations,    sub: fmtDuration(fanMs) + " total",        color: "text-purple-400" },
-          { label: "Mediciones recib.",  value: stats.measurements.length, sub: "últimas registradas",          color: "text-emerald-400" },
+          { label: "Mediciones recib.",  value: stats.measurements.length, sub: "últimas registradas",          color: "text-amber-400" },
         ].map(k => (
           <div key={k.label} className="rounded-xl border border-[var(--border)] bg-[var(--bg-surface)] p-5">
             <p className="text-xs text-[var(--text-muted)] mb-1">{k.label}</p>

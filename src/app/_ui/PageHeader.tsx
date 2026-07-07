@@ -31,7 +31,7 @@ type BtnProps = { children: ReactNode; onClick?: () => void; disabled?: boolean;
 export function BtnPrimary({ children, onClick, disabled, type = "button", className = "" }: BtnProps) {
   return (
     <button type={type} onClick={onClick} disabled={disabled}
-      className={`inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition ${className}`}>
+      className={`inline-flex items-center gap-1.5 rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed transition ${className}`}>
       {children}
     </button>
   );
@@ -62,7 +62,7 @@ export function IconBtn({ icon, label, onClick, disabled, variant = "default" }:
   const cls = {
     default: "text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]",
     danger:  "text-[var(--danger)] hover:bg-red-500/10",
-    primary: "text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10",
+    primary: "text-amber-500 hover:text-amber-400 hover:bg-amber-500/10",
   }[variant];
   return (
     <button type="button" onClick={onClick} disabled={disabled} title={label} aria-label={label}

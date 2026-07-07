@@ -9,14 +9,15 @@
  */
 
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, IBM_Plex_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/app/_components/ThemeProvider";
 import { ServiceWorkerRegister } from "@/app/_components/ServiceWorkerRegister";
 import { PwaInstallBanner } from "@/app/_components/PwaInstallBanner";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
+const bodyFont = IBM_Plex_Sans({ variable: "--font-geist-sans", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+const monoFont = IBM_Plex_Mono({ variable: "--font-geist-mono", subsets: ["latin"], weight: ["400", "500", "600"] });
+const displayFont = Space_Grotesk({ variable: "--font-display", subsets: ["latin"], weight: ["500", "600", "700"] });
 
 export const metadata: Metadata = {
   title: { default: "Galpon", template: "%s — Galpon" },
@@ -39,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="es"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full`}
+      className={`${bodyFont.variable} ${monoFont.variable} ${displayFont.variable} h-full`}
     >
       <body className="min-h-full flex flex-col antialiased">
         <ThemeProvider>

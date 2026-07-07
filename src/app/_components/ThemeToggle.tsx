@@ -35,35 +35,24 @@ export function ThemeToggle() {
 
   return (
     <button
-      role="switch"
-      aria-checked={isOverridden}
       onClick={toggle}
       title={
         isOverridden
           ? `Volver al tema del sistema (${resolved === "dark" ? "oscuro" : "claro"})`
           : `Cambiar a modo ${resolved === "dark" ? "claro" : "oscuro"}`
       }
-      className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-(--bg-surface) ${
-        isOverridden
-          ? "bg-slate-700 border-slate-600"
-          : "bg-(--bg-subtle) border-(--border)"
-      }`}
+      className="w-9.5 h-9.5 shrink-0 rounded-[10px] border border-(--border) bg-(--bg-surface) text-(--text-primary) flex items-center justify-center cursor-pointer hover:bg-(--bg-subtle) transition-colors"
     >
-      <span
-        className={`inline-flex items-center justify-center h-4.5 w-4.5 rounded-full bg-white shadow-md transition-transform duration-300 mt-0.5 ${
-          isOverridden ? "translate-x-5.5" : "translate-x-0.5"
-        }`}
-      >
-        {resolved === "dark" ? (
-          <svg className="w-2.5 h-2.5 text-slate-600" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-          </svg>
-        ) : (
-          <svg className="w-2.5 h-2.5 text-amber-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-            <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
-          </svg>
-        )}
-      </span>
+      {resolved === "dark" ? (
+        <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" aria-hidden>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" />
+        </svg>
+      ) : (
+        <svg className="w-4.5 h-4.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.8} stroke="currentColor" aria-hidden>
+          <circle cx="12" cy="12" r="5" strokeLinecap="round" strokeLinejoin="round" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+        </svg>
+      )}
     </button>
   );
 }

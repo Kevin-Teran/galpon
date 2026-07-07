@@ -97,8 +97,8 @@ function RoleBadge({ role }: { role: string }) {
 
 function Avatar({ name }: { name: string }) {
   return (
-    <div className="w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center shrink-0">
-      <span className="text-sm font-semibold text-emerald-400">{name[0]?.toUpperCase()}</span>
+    <div className="w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center shrink-0">
+      <span className="text-sm font-semibold text-amber-400">{name[0]?.toUpperCase()}</span>
     </div>
   );
 }
@@ -110,7 +110,7 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input {...props}
-      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition disabled:opacity-50"
+      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition disabled:opacity-50"
     />
   );
 }
@@ -118,7 +118,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
 function SelectField(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select {...props}
-      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition disabled:opacity-50"
+      className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition disabled:opacity-50"
     />
   );
 }
@@ -148,7 +148,7 @@ function Modal({ title, onClose, children, wide }: { title: string; onClose: () 
 function SubmitBtn({ pending, label, pendingLabel }: { pending: boolean; label: string; pendingLabel: string }) {
   return (
     <button type="submit" disabled={pending}
-      className="flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-emerald-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
+      className="flex items-center gap-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-500 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-500 hover:to-amber-400 disabled:opacity-50 transition-all duration-200 active:scale-[0.98]"
     >
       {pending && <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>}
       {pending ? pendingLabel : label}
@@ -200,8 +200,8 @@ function ActivityModal({
 
           {/* Stat chips */}
           <div className="flex gap-3">
-            <StatChip label="Inicios de sesión" value={data.loginCount}     accent="text-emerald-400" />
-            <StatChip label="Sesiones activas"  value={data.activeSessions} accent={data.activeSessions > 0 ? "text-emerald-400" : "text-(--text-primary)"} />
+            <StatChip label="Inicios de sesión" value={data.loginCount}     accent="text-amber-400" />
+            <StatChip label="Sesiones activas"  value={data.activeSessions} accent={data.activeSessions > 0 ? "text-amber-400" : "text-(--text-primary)"} />
           </div>
 
           {/* Last login */}
@@ -441,7 +441,7 @@ export default function UsersPage() {
           {isSuperAdmin ? "Todos los usuarios del sistema" : "Usuarios de tu organización"}
         </p>
         <button onClick={openCreate}
-          className="shrink-0 flex items-center gap-2 rounded-xl bg-linear-to-r from-emerald-600 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 transition-all duration-200 active:scale-[0.98]"
+          className="shrink-0 flex items-center gap-2 rounded-xl bg-linear-to-r from-amber-600 to-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-500 hover:to-amber-400 transition-all duration-200 active:scale-[0.98]"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -460,7 +460,7 @@ export default function UsersPage() {
           <input
             type="text" value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre o correo…"
-            className="w-full rounded-xl border border-(--border) bg-(--bg-surface) pl-9 pr-8 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition"
+            className="w-full rounded-xl border border-(--border) bg-(--bg-surface) pl-9 pr-8 py-2.5 text-sm text-(--text-primary) placeholder:text-(--text-muted) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition"
           />
           {search && (
             <button onClick={() => setSearch("")}
@@ -474,7 +474,7 @@ export default function UsersPage() {
 
         {/* Role filter */}
         <select value={filterRole} onChange={e => setFilterRole(e.target.value)}
-          className="w-full lg:w-auto rounded-xl border border-(--border) bg-(--bg-surface) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition">
+          className="w-full lg:w-auto rounded-xl border border-(--border) bg-(--bg-surface) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition">
           <option value="">Todos los roles</option>
           <option value="SUPER_ADMIN">Super Admin</option>
           <option value="ADMIN">Administrador</option>
@@ -484,7 +484,7 @@ export default function UsersPage() {
         {/* Org filter — SA only */}
         {isSuperAdmin && orgs.length > 0 && (
           <select value={filterOrg} onChange={e => setFilterOrg(e.target.value)}
-            className="w-full lg:w-auto rounded-xl border border-(--border) bg-(--bg-surface) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition">
+            className="w-full lg:w-auto rounded-xl border border-(--border) bg-(--bg-surface) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition">
             <option value="">Todas las organizaciones</option>
             {orgs.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
           </select>
@@ -492,7 +492,7 @@ export default function UsersPage() {
 
         {/* Page size */}
         <select value={pageSize} onChange={e => setPageSize(Number(e.target.value))}
-          className="w-full lg:w-auto rounded-xl border border-(--border) bg-(--bg-surface) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/25 transition">
+          className="w-full lg:w-auto rounded-xl border border-(--border) bg-(--bg-surface) px-3.5 py-2.5 text-sm text-(--text-primary) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/25 transition">
           <option value={10}>10 por página</option>
           <option value={25}>25 por página</option>
           <option value={50}>50 por página</option>
@@ -511,7 +511,7 @@ export default function UsersPage() {
             <p className="text-sm">{users.length === 0 ? "No hay usuarios registrados" : "Sin resultados para los filtros aplicados"}</p>
             {users.length > 0 && (
               <button onClick={() => { setSearch(""); setFilterRole(""); setFilterOrg(""); }}
-                className="text-xs text-emerald-400 hover:underline">
+                className="text-xs text-amber-400 hover:underline">
                 Limpiar filtros
               </button>
             )}
@@ -540,7 +540,7 @@ export default function UsersPage() {
                           <p className="font-medium text-(--text-primary) truncate">
                             {u.name}
                             {isMe && (
-                              <span className="ml-2 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 rounded-full px-1.5 py-0.5">tú</span>
+                              <span className="ml-2 text-[10px] font-semibold text-amber-400 bg-amber-500/10 rounded-full px-1.5 py-0.5">tú</span>
                             )}
                           </p>
                           <p className="text-xs text-(--text-muted) truncate">{u.email}</p>
@@ -645,7 +645,7 @@ export default function UsersPage() {
                       <button key={item} onClick={() => setPage(item as number)}
                         className={`min-w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
                           page === item
-                            ? "bg-emerald-500/15 text-emerald-400 font-semibold"
+                            ? "bg-amber-500/15 text-amber-400 font-semibold"
                             : "text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-subtle)"
                         }`}>
                         {(item as number) + 1}

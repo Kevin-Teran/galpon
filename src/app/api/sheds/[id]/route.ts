@@ -40,10 +40,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           orderBy: { createdAt: "asc" },
           include: {
             sensors: { orderBy: [{ side: "asc" }, { metric: "asc" }] },
-            pumps:   { orderBy: { pumpNumber: "asc" } },
+            pumps:   { orderBy: { pumpNumber: "asc" }, include: { pumpEvents: { where: { endedAt: null }, take: 1 } } },
           },
         },
-        fans:  { orderBy: { fanNumber: "asc" } },
+        fans:  { orderBy: { fanNumber: "asc" }, include: { fanEvents: { where: { endedAt: null }, take: 1 } } },
         organization: { select: { name: true, alertRanges: true } },
       },
     });

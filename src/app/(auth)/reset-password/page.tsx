@@ -63,7 +63,7 @@ function ResetPasswordForm() {
           </svg>
           <p className="text-sm text-red-400">Enlace inválido o expirado.</p>
         </div>
-        <Link href="/forgot-password" className="text-sm text-emerald-500 hover:text-emerald-400 transition-colors">
+        <Link href="/forgot-password" className="text-sm text-amber-500 hover:text-amber-400 transition-colors">
           Solicitar un nuevo enlace
         </Link>
       </div>
@@ -111,7 +111,7 @@ function ResetPasswordForm() {
             type={showPass ? "text" : "password"}
             required minLength={8}
             placeholder="Mínimo 8 caracteres"
-            className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) pl-10 pr-11 py-2.5 text-sm text-(--text-primary) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition"
+            className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) pl-10 pr-11 py-2.5 text-sm text-(--text-primary) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition"
           />
           <button
             type="button"
@@ -139,7 +139,7 @@ function ResetPasswordForm() {
             type={showPass ? "text" : "password"}
             required minLength={8}
             placeholder="Repite la contraseña"
-            className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) pl-10 pr-4 py-2.5 text-sm text-(--text-primary) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition"
+            className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) pl-10 pr-4 py-2.5 text-sm text-(--text-primary) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition"
           />
         </div>
       </div>
@@ -155,7 +155,7 @@ function ResetPasswordForm() {
 
       <button
         type="submit" disabled={isPending}
-        className="w-full rounded-xl bg-linear-to-r from-emerald-600 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 hover:bg-linear-to-r hover:shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-(--bg-surface) active:scale-[0.98]"
+        className="w-full rounded-xl bg-linear-to-r from-amber-600 to-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-500 hover:to-amber-400 hover:bg-linear-to-r hover:shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-(--bg-surface) active:scale-[0.98]"
       >
         {isPending ? (
           <span className="flex items-center justify-center gap-2">
@@ -182,10 +182,10 @@ export default function ResetPasswordPage() {
       {/* Logo + título */}
       <div className="flex flex-col items-center text-center space-y-4">
         <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-emerald-500/20 blur-xl scale-125" />
-          <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 shadow-lg">
+          <div className="absolute inset-0 rounded-2xl bg-amber-500/20 blur-xl scale-125" />
+          <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/25 shadow-lg">
             <svg
-              className="w-8 h-8 text-emerald-400"
+              className="w-8 h-8 text-amber-400"
               fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 5.25a3 3 0 0 1 3 3m3 0a6 6 0 0 1-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 0 1 21.75 8.25Z" />

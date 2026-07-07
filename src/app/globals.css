@@ -5,29 +5,29 @@
 
 /* ── CSS variables por tema ──────────────────────────────────────────────── */
 :root {
-  --bg-base:        #f8fafc;
-  --bg-surface:     #ffffff;
-  --bg-subtle:      #f1f5f9;
-  --border:         #e2e8f0;
-  --text-primary:   #0f172a;
-  --text-secondary: #64748b;
-  --text-muted:     #94a3b8;
-  --accent:         #10b981;
-  --accent-hover:   #059669;
+  --bg-base:        oklch(0.984 0.004 95);
+  --bg-surface:     oklch(1 0 0);
+  --bg-subtle:      oklch(0.965 0.005 95);
+  --border:         oklch(0.915 0.006 95);
+  --text-primary:   oklch(0.26 0.012 60);
+  --text-secondary: oklch(0.42 0.012 65);
+  --text-muted:     oklch(0.53 0.012 70);
+  --accent:         oklch(0.72 0.14 70);
+  --accent-hover:   oklch(0.66 0.15 70);
   --danger:         #ef4444;
   --warning:        #f59e0b;
 }
 
 .dark {
-  --bg-base:        #020617;
-  --bg-surface:     #0f172a;
-  --bg-subtle:      #1e293b;
-  --border:         #1e293b;
-  --text-primary:   #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted:     #475569;
-  --accent:         #10b981;
-  --accent-hover:   #34d399;
+  --bg-base:        oklch(0.185 0.012 250);
+  --bg-surface:     oklch(0.232 0.014 250);
+  --bg-subtle:      oklch(0.28 0.016 250);
+  --border:         oklch(0.33 0.018 250);
+  --text-primary:   oklch(0.96 0.005 250);
+  --text-secondary: oklch(0.8 0.01 250);
+  --text-muted:     oklch(0.68 0.012 250);
+  --accent:         oklch(0.72 0.14 70);
+  --accent-hover:   oklch(0.78 0.13 70);
   --danger:         #f87171;
   --warning:        #fbbf24;
 }
@@ -42,6 +42,11 @@ body {
   transition: background-color 0.2s, color 0.2s;
 }
 
+h1, h2, h3 {
+  font-family: var(--font-display), var(--font-geist-sans, Arial, sans-serif);
+  letter-spacing: -0.02em;
+}
+
 /* ── Scrollbar ───────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar        { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track  { background: transparent; }
@@ -53,4 +58,10 @@ body {
   12%  { opacity: 1; }
   88%  { opacity: 1; }
   100% { left: 108%; opacity: 0; }
+}
+
+/* ── Punto "en vivo" pulsante (topbar, indicadores de conexión) ──────────── */
+@keyframes breathe {
+  0%, 100% { opacity: 0.5; }
+  50%      { opacity: 1; }
 }

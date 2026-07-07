@@ -128,7 +128,7 @@ export default function ShedsPage() {
                 <td className="px-4 py-3 text-[var(--text-secondary)]">{s.area ? `${s.area} m²` : "—"}</td>
                 <td className="px-4 py-3 text-[var(--text-muted)] max-w-[160px] truncate">
                   {s.mapsUrl
-                    ? <a href={s.mapsUrl} target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:underline">{s.location || "Ver mapa"}</a>
+                    ? <a href={s.mapsUrl} target="_blank" rel="noopener noreferrer" className="text-amber-500 hover:underline">{s.location || "Ver mapa"}</a>
                     : (s.location ?? "—")}
                 </td>
                 <td className="px-4 py-3">

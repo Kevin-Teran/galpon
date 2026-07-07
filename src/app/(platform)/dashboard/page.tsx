@@ -89,16 +89,16 @@ function QuickCard({
   return (
     <Link
       href={href}
-      className="group rounded-2xl border border-(--border) bg-(--bg-surface) p-5 flex flex-col gap-4 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5 transition-all duration-200"
+      className="group rounded-2xl border border-(--border) bg-(--bg-surface) p-5 flex flex-col gap-4 hover:border-amber-500/30 hover:shadow-lg hover:shadow-amber-500/5 transition-all duration-200"
     >
       <div className={`w-11 h-11 rounded-xl flex items-center justify-center transition-colors duration-200 ${colors[color]}`}>
         {icon}
       </div>
       <div>
-        <p className="font-semibold text-(--text-primary) group-hover:text-emerald-400 transition-colors">{title}</p>
+        <p className="font-semibold text-(--text-primary) group-hover:text-amber-400 transition-colors">{title}</p>
         <p className="text-sm text-(--text-muted) mt-1 leading-relaxed">{description}</p>
       </div>
-      <div className="flex items-center gap-1 text-sm text-(--text-muted) group-hover:text-emerald-400 transition-colors mt-auto">
+      <div className="flex items-center gap-1 text-sm text-(--text-muted) group-hover:text-amber-400 transition-colors mt-auto">
         <span>Ir a {title.toLowerCase()}</span>
         <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden>
           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
@@ -241,15 +241,15 @@ export default async function DashboardPage() {
         <div className="rounded-2xl border border-(--border) bg-(--bg-surface) p-5">
           <div className="flex flex-wrap gap-x-8 gap-y-4">
             <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
               <span className="text-sm text-(--text-secondary)">Plataforma operativa</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
               <span className="text-sm text-(--text-secondary)">Base de datos conectada</span>
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" />
+              <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
               <span className="text-sm text-(--text-secondary)">Broker MQTT activo</span>
             </div>
             <div className="flex items-center gap-2.5">

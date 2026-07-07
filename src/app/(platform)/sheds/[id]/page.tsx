@@ -168,7 +168,7 @@ export default function ShedDetailPage({ params }: { params: Params }) {
           </div>
         </div>
         {shed.mapsUrl && (
-          <a href={shed.mapsUrl} target="_blank" rel="noreferrer" className="text-xs text-emerald-500 hover:text-emerald-400 transition mt-1">
+          <a href={shed.mapsUrl} target="_blank" rel="noreferrer" className="text-xs text-amber-500 hover:text-amber-400 transition mt-1">
             Ver mapa ↗
           </a>
         )}
@@ -178,7 +178,7 @@ export default function ShedDetailPage({ params }: { params: Params }) {
       <div className="flex gap-0.5 mb-5 border-b border-[var(--border)] overflow-x-auto">
         {TABS.map(t => (
           <button key={t.key} onClick={() => changeTab(t.key as Tab)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition ${tab === t.key ? "border-emerald-500 text-emerald-500" : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}>
+            className={`px-4 py-2 text-sm font-medium border-b-2 whitespace-nowrap transition ${tab === t.key ? "border-amber-500 text-amber-500" : "border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]"}`}>
             {t.label}
           </button>
         ))}
@@ -276,7 +276,7 @@ export default function ShedDetailPage({ params }: { params: Params }) {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h2 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Nodos</h2>
-              <button onClick={() => changeTab("nodes")} className="text-xs text-emerald-500 hover:text-emerald-400 transition">Gestionar →</button>
+              <button onClick={() => changeTab("nodes")} className="text-xs text-amber-500 hover:text-amber-400 transition">Gestionar →</button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {shed.nodes.map(n => (
@@ -290,7 +290,7 @@ export default function ShedDetailPage({ params }: { params: Params }) {
                   <p className="text-xs text-[var(--text-muted)]">{n.sensors.length} sensores · {n.pumps.length > 0 ? "con bomba" : "sin bomba"}</p>
                 </Link>
               ))}
-              {shed.nodes.length === 0 && <p className="text-xs text-[var(--text-muted)] col-span-3">Sin nodos — <button onClick={() => changeTab("nodes")} className="text-emerald-500 hover:underline">ir a gestión</button></p>}
+              {shed.nodes.length === 0 && <p className="text-xs text-[var(--text-muted)] col-span-3">Sin nodos — <button onClick={() => changeTab("nodes")} className="text-amber-500 hover:underline">ir a gestión</button></p>}
             </div>
           </div>
         </div>
@@ -436,7 +436,7 @@ export default function ShedDetailPage({ params }: { params: Params }) {
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Sensores ({activeNode.sensors.length}/4)</p>
                 {activeNode.sensors.length < 4 && addingType !== "sensor" && (
-                  <button onClick={() => { setSensorForm(emptySensor); setAddingType("sensor"); setError(null); }} className="inline-flex items-center gap-1 text-xs text-emerald-500 hover:text-emerald-400 font-medium transition"><IconPlus size={12} /> Sensor</button>
+                  <button onClick={() => { setSensorForm(emptySensor); setAddingType("sensor"); setError(null); }} className="inline-flex items-center gap-1 text-xs text-amber-500 hover:text-amber-400 font-medium transition"><IconPlus size={12} /> Sensor</button>
                 )}
               </div>
               {(["EXTERIOR","INTERIOR"] as const).map(side => {
@@ -493,7 +493,7 @@ export default function ShedDetailPage({ params }: { params: Params }) {
               <div className="flex items-center justify-between mb-2">
                 <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Bomba</p>
                 {activeNode.pumps.length === 0 && addingType !== "pump" && (
-                  <button onClick={() => { setPumpForm(emptyPump); setAddingType("pump"); setError(null); }} className="inline-flex items-center gap-1 text-xs text-emerald-500 hover:text-emerald-400 font-medium transition"><IconPlus size={12} /> Bomba</button>
+                  <button onClick={() => { setPumpForm(emptyPump); setAddingType("pump"); setError(null); }} className="inline-flex items-center gap-1 text-xs text-amber-500 hover:text-amber-400 font-medium transition"><IconPlus size={12} /> Bomba</button>
                 )}
               </div>
               {activeNode.pumps.map(p => (

@@ -27,6 +27,6 @@ export function Field({ label, description, error, children }: FieldProps) {
 }
 
 export const inputCls =
-  "w-full rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-emerald-500 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition";
+  "w-full rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition";
 
 export const selectCls = inputCls;

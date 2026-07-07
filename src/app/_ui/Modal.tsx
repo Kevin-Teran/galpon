@@ -44,7 +44,7 @@ export function Modal({ open, title, onClose, children }: ModalProps) {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
           <h2 className="text-base font-semibold text-[var(--text-primary)]">{title}</h2>
           <button onClick={onClose} aria-label="Cerrar"
-            className="w-8 h-8 flex items-center justify-center rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition">
+            className="w-8.5 h-8.5 shrink-0 flex items-center justify-center rounded-[10px] border border-(--border) bg-(--bg-subtle) text-(--text-primary) hover:bg-(--border) transition-colors">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
             </svg>

@@ -61,10 +61,10 @@ export default function ForgotPasswordPage() {
       {/* Logo + título */}
       <div className="flex flex-col items-center text-center space-y-4">
         <div className="relative">
-          <div className="absolute inset-0 rounded-2xl bg-emerald-500/20 blur-xl scale-125" />
-          <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/25 shadow-lg">
+          <div className="absolute inset-0 rounded-2xl bg-amber-500/20 blur-xl scale-125" />
+          <div className="relative flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/25 shadow-lg">
             <svg
-              className="w-8 h-8 text-emerald-400"
+              className="w-8 h-8 text-amber-400"
               fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden
             >
               <path strokeLinecap="round" strokeLinejoin="round"
@@ -89,9 +89,9 @@ export default function ForgotPasswordPage() {
           /* Estado: enviado */
           <div className="flex flex-col items-center text-center space-y-5">
             <div className="relative">
-              <div className="absolute inset-0 rounded-full bg-emerald-500/20 blur-lg" />
-              <div className="relative w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center">
-                <svg className="w-6 h-6 text-emerald-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden>
+              <div className="absolute inset-0 rounded-full bg-amber-500/20 blur-lg" />
+              <div className="relative w-14 h-14 rounded-full bg-amber-500/10 border border-amber-500/25 flex items-center justify-center">
+                <svg className="w-6 h-6 text-amber-400" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden>
                   <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                 </svg>
               </div>
@@ -117,7 +117,7 @@ export default function ForgotPasswordPage() {
                 <input
                   id="email" name="email" type="email" required
                   placeholder="usuario@ejemplo.com"
-                  className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) pl-10 pr-4 py-2.5 text-sm text-(--text-primary) focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 transition"
+                  className="w-full rounded-xl border border-(--border) bg-(--bg-subtle) pl-10 pr-4 py-2.5 text-sm text-(--text-primary) focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/30 transition"
                 />
               </div>
             </div>
@@ -133,7 +133,7 @@ export default function ForgotPasswordPage() {
 
             <button
               type="submit" disabled={isPending}
-              className="w-full rounded-xl bg-linear-to-r from-emerald-600 to-emerald-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-500 hover:to-emerald-400 hover:bg-linear-to-r hover:shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-(--bg-surface) active:scale-[0.98]"
+              className="w-full rounded-xl bg-linear-to-r from-amber-600 to-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 hover:from-amber-500 hover:to-amber-400 hover:bg-linear-to-r hover:shadow-amber-500/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-(--bg-surface) active:scale-[0.98]"
             >
               {isPending ? (
                 <span className="flex items-center justify-center gap-2">
